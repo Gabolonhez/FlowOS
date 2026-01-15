@@ -13,6 +13,7 @@ import { useLanguage } from "@/context/language-context";
 import { Plus } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ConfirmDialog } from "@/components/modals/confirm-dialog";
 
 
 
@@ -23,6 +24,7 @@ export default function BoardPage() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
 
     const [activeId, setActiveId] = useState<string | null>(null);
     const { t } = useLanguage();
@@ -57,16 +59,21 @@ export default function BoardPage() {
         }
     }
 
-    async function handleDeleteTask(taskId: string) {
-        if (!confirm(t('common.are_you_sure'))) return;
+    function handleDeleteTask(taskId: string) {
+        setDeleteTaskId(taskId);
+    }
 
+    async function confirmDelete() {
+        if (!deleteTaskId) return;
         try {
-            await deleteTask(taskId);
-            setTasks(tasks.filter(t => t.id !== taskId));
-            toast({ title: t('common.success'), description: "Task deleted successfully" }); // Assuming we might want to add a specific key later, but hardcoded fallback or reused keys valid.
+            await deleteTask(deleteTaskId);
+            setTasks(tasks.filter(t => t.id !== deleteTaskId));
+            toast({ title: t('common.success'), description: "Task deleted successfully" });
         } catch (e) {
             console.error(e);
             toast({ title: t('common.error'), description: "Failed to delete task", variant: "destructive" });
+        } finally {
+            setDeleteTaskId(null);
         }
     }
 
@@ -151,6 +158,17 @@ export default function BoardPage() {
                 onOpenChange={setIsModalOpen}
                 task={selectedTask}
                 onSuccess={fetchData}
+            />
+
+            <ConfirmDialog
+                isOpen={!!deleteTaskId}
+                onClose={() => setDeleteTaskId(null)}
+                onConfirm={confirmDelete}
+                title={t('common.delete_title')}
+                description={t('common.delete_desc')}
+                confirmText={t('common.delete')}
+                cancelText={t('common.cancel')}
+                variant="destructive"
             />
         </div>
     );

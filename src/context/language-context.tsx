@@ -19,8 +19,19 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         setMounted(true);
         const savedLang = localStorage.getItem("flowos_language") as Language;
+
         if (savedLang && ["en", "pt", "es"].includes(savedLang)) {
             setLanguageState(savedLang);
+        } else {
+            // Auto-detect from browser
+            const browserLang = window.navigator.language.toLowerCase();
+            if (browserLang.startsWith("pt")) {
+                setLanguageState("pt");
+            } else if (browserLang.startsWith("es")) {
+                setLanguageState("es");
+            } else {
+                setLanguageState("en");
+            }
         }
     }, []);
 

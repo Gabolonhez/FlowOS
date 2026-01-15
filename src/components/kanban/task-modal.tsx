@@ -1,17 +1,15 @@
-
-"use client";
-
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Task, Project, Version, Profile, TaskStatus, TaskPriority } from "@/types";
-import { createTask, updateTask, getProjects, getVersions, getProfiles } from "@/lib/api";
+import { Task, Project, Version, TeamMember, TaskStatus, TaskPriority } from "@/types";
+import { createTask, updateTask, getProjects, getVersions, getMembers } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TaskModalProps {
     open: boolean;
@@ -26,7 +24,7 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
     const [submitting, setSubmitting] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
     const [versions, setVersions] = useState<Version[]>([]);
-    const [profiles, setProfiles] = useState<Profile[]>([]);
+    const [members, setMembers] = useState<TeamMember[]>([]);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -40,10 +38,10 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
 
     useEffect(() => {
         if (open) {
-            Promise.all([getProjects(), getVersions(), getProfiles()]).then(([p, v, u]) => {
+            Promise.all([getProjects(), getVersions(), getMembers()]).then(([p, v, m]) => {
                 setProjects(p);
                 setVersions(v);
-                setProfiles(u);
+                setMembers(m);
             });
             if (task) {
                 setFormData({
@@ -67,16 +65,17 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
                 });
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, task]);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const data: any = {
+            const data = {
                 ...formData,
-                assigneeId: formData.assigneeId === "none" ? null : formData.assigneeId,
-                versionId: formData.versionId === "" ? null : formData.versionId
+                assigneeId: formData.assigneeId === "none" ? undefined : formData.assigneeId,
+                versionId: formData.versionId === "" ? undefined : formData.versionId
             };
 
             if (task) {
@@ -163,8 +162,16 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
                             <SelectTrigger><SelectValue placeholder={t('common.unassigned')} /></SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="none">{t('common.unassigned')}</SelectItem>
-                                {profiles.map(p => (
-                                    <SelectItem key={p.id} value={p.id}>{p.full_name || p.email || t('common.unknown')}</SelectItem>
+                                {members.map(m => (
+                                    <SelectItem key={m.id} value={m.id}>
+                                        <div className="flex items-center gap-2">
+                                            <Avatar className="h-5 w-5">
+                                                <AvatarImage src={m.avatarUrl} />
+                                                <AvatarFallback className="text-[10px]">{m.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                            </Avatar>
+                                            <span>{m.nickname || m.name}</span>
+                                        </div>
+                                    </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>

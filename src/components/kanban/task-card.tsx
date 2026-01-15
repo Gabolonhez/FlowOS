@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useDraggable } from "@dnd-kit/core";
@@ -8,7 +7,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 import { Trash } from "lucide-react";
-import { Button } from "../ui/button";
 
 interface TaskCardProps {
     task: Task;
@@ -57,8 +55,8 @@ export function TaskCard({ task, project, onClick, onDelete }: TaskCardProps) {
 
                 {task.assignee && (
                     <Avatar className="h-6 w-6">
-                        <AvatarImage src={task.assignee.avatar_url} />
-                        <AvatarFallback>{task.assignee.full_name?.slice(0, 2).toUpperCase() || '??'}</AvatarFallback>
+                        <AvatarImage src={task.assignee.avatarUrl} />
+                        <AvatarFallback>{task.assignee.name?.slice(0, 2).toUpperCase() || '??'}</AvatarFallback>
                     </Avatar>
                 )}
             </div>

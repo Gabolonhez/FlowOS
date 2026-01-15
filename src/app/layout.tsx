@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "FlowOS",
-  description: "Productivity OS",
+  description: "Kanban and version control for your team & apps",
 };
 
 export default function RootLayout({

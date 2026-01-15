@@ -41,7 +41,10 @@ export const translations = {
             none: "None",
             unassigned: "Unassigned",
             unknown: "Unknown",
-            are_you_sure: "Are you sure?"
+            are_you_sure: "Are you sure?",
+            confirm: "Confirm",
+            delete_title: "Delete item?",
+            delete_desc: "This action cannot be undone. Are you sure you want to proceed?"
         },
         dashboard: {
             quick_stats: "Quick Stats",
@@ -77,6 +80,7 @@ export const translations = {
             subtitle: "Manage project versions and releases",
             version_name: "Version Name",
             release_date: "Release Date",
+            planned: "Planned",
             in_development: "In Development",
             in_stores: "In Stores",
             deprecated: "Deprecated",
@@ -87,7 +91,13 @@ export const translations = {
             version_deleted: "Version deleted",
             load_error: "Failed to load data",
             create_error: "Failed to create version",
-            delete_error: "Failed to delete"
+            delete_error: "Failed to delete",
+            edit_version: "Edit Version",
+            edit_desc: "Update version details.",
+            version_updated: "Version updated successfully",
+            update_error: "Failed to update version",
+            view_list: "List",
+            view_board: "Board"
         },
         apps: {
             title: "Apps & Projects",
@@ -153,6 +163,30 @@ export const translations = {
                 dark: "Dark",
                 enabled: "Enabled"
             }
+        },
+        team: {
+            title: "Team Management",
+            subtitle: "Manage your team members and roles.",
+            search_placeholder: "Search team...",
+            add_member: "Add Member",
+            member: "Member",
+            nickname: "Nickname",
+            role: "Role",
+            actions: "Actions",
+            no_members: "No members found.",
+            add_dialog_title: "Add Team Member",
+            add_dialog_desc: "Add a new member to your team.",
+            full_name: "Full Name",
+            nickname_optional: "Nickname (Optional)",
+            role_optional: "Role (Optional)",
+            adding: "Adding...",
+            remove_dialog_title: "Remove Member",
+            remove_dialog_desc: "Are you sure you want to remove this team member? They will be unassigned from tasks.",
+            member_added: "Team member added.",
+            member_removed: "Team member removed.",
+            add_error: "Failed to add member.",
+            remove_error: "Failed to remove member.",
+            menu: "Team"
         }
     },
     pt: {
@@ -195,7 +229,10 @@ export const translations = {
             none: "Nenhum",
             unassigned: "Não atribuído",
             unknown: "Desconhecido",
-            are_you_sure: "Tem certeza?"
+            are_you_sure: "Tem certeza?",
+            confirm: "Confirmar",
+            delete_title: "Excluir item?",
+            delete_desc: "Esta ação não pode ser desfeita. Tem certeza de que deseja prosseguir?"
         },
         dashboard: {
             quick_stats: "Estatísticas Rápidas",
@@ -231,6 +268,7 @@ export const translations = {
             subtitle: "Gerencie versões e lançamentos do projeto",
             version_name: "Nome da Versão",
             release_date: "Data de Lançamento",
+            planned: "Previsto",
             in_development: "Em Desenvolvimento",
             in_stores: "Nas Lojas",
             deprecated: "Descontinuado",
@@ -241,7 +279,13 @@ export const translations = {
             version_deleted: "Versão excluída",
             load_error: "Falha ao carregar dados",
             create_error: "Falha ao criar versão",
-            delete_error: "Falha ao excluir"
+            delete_error: "Falha ao excluir",
+            edit_version: "Editar Versão",
+            edit_desc: "Atualizar detalhes da versão.",
+            version_updated: "Versão atualizada com sucesso",
+            update_error: "Falha ao atualizar versão",
+            view_list: "Lista",
+            view_board: "Quadro"
         },
         apps: {
             title: "Apps e Projetos",
@@ -308,6 +352,30 @@ export const translations = {
                 dark: "Escuro",
                 enabled: "Ativo"
             }
+        },
+        team: {
+            title: "Gestão de Equipe",
+            subtitle: "Gerencie os membros e funções da sua equipe.",
+            search_placeholder: "Buscar equipe...",
+            add_member: "Adicionar Membro",
+            member: "Membro",
+            nickname: "Apelido",
+            role: "Função",
+            actions: "Ações",
+            no_members: "Nenhum membro encontrado.",
+            add_dialog_title: "Adicionar Membro da Equipe",
+            add_dialog_desc: "Adicione um novo membro à sua equipe.",
+            full_name: "Nome Completo",
+            nickname_optional: "Apelido (Opcional)",
+            role_optional: "Função (Opcional)",
+            adding: "Adicionando...",
+            remove_dialog_title: "Remover Membro",
+            remove_dialog_desc: "Tem certeza de que deseja remover este membro da equipe? Ele será removido das tarefas atribuídas.",
+            member_added: "Membro da equipe adicionado.",
+            member_removed: "Membro da equipe removido.",
+            add_error: "Falha ao adicionar membro.",
+            remove_error: "Falha ao remover membro.",
+            menu: "Equipe"
         }
     },
     es: {
@@ -350,7 +418,10 @@ export const translations = {
             none: "Ninguno",
             unassigned: "Sin Asignar",
             unknown: "Desconocido",
-            are_you_sure: "¿Estás seguro?"
+            are_you_sure: "¿Estás seguro?",
+            confirm: "Confirmar",
+            delete_title: "¿Eliminar elemento?",
+            delete_desc: "Esta acción no se puede deshacer. ¿Estás seguro de que quieres continuar?"
         },
         dashboard: {
             quick_stats: "Estadísticas Rápidas",
@@ -386,6 +457,7 @@ export const translations = {
             subtitle: "Gestionar versiones y lanzamientos del proyecto",
             version_name: "Nombre de la Versión",
             release_date: "Fecha de Lanzamiento",
+            planned: "Planificado",
             in_development: "En Desarrollo",
             in_stores: "En Tiendas",
             deprecated: "Obsoleto",
@@ -396,7 +468,13 @@ export const translations = {
             version_deleted: "Versión eliminada",
             load_error: "Error al cargar datos",
             create_error: "Error al crear versión",
-            delete_error: "Error al eliminar"
+            delete_error: "Error al eliminar",
+            edit_version: "Editar Versión",
+            edit_desc: "Actualizar detalles de la versión.",
+            version_updated: "Versión actualizada con éxito",
+            update_error: "Error al actualizar versión",
+            view_list: "Lista",
+            view_board: "Tablero"
         },
         apps: {
             title: "Apps y Proyectos",
@@ -462,6 +540,30 @@ export const translations = {
                 dark: "Oscuro",
                 enabled: "Habilitado"
             }
+        },
+        team: {
+            title: "Gestión de Equipo",
+            subtitle: "Gestiona los miembros y roles de tu equipo.",
+            search_placeholder: "Buscar equipo...",
+            add_member: "Añadir Miembro",
+            member: "Miembro",
+            nickname: "Apodo",
+            role: "Rol",
+            actions: "Acciones",
+            no_members: "No se encontraron miembros.",
+            add_dialog_title: "Añadir Miembro del Equipo",
+            add_dialog_desc: "Añade un nuevo miembro a tu equipo.",
+            full_name: "Nombre Completo",
+            nickname_optional: "Apodo (Opcional)",
+            role_optional: "Rol (Opcional)",
+            adding: "Añadiendo...",
+            remove_dialog_title: "Eliminar Miembro",
+            remove_dialog_desc: "¿Estás seguro de que quieres eliminar a este miembro del equipo? Se desasignará de las tareas.",
+            member_added: "Miembro del equipo añadido.",
+            member_removed: "Miembro del equipo eliminado.",
+            add_error: "Error al añadir miembro.",
+            remove_error: "Error al eliminar miembro.",
+            menu: "Equipo"
         }
     }
 };

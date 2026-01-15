@@ -1,6 +1,5 @@
-
 import { createClient } from "@/lib/supabase/client";
-import { Task, Version, Project, Doc, TaskStatus } from "@/types";
+import { Task, Version, Project, Doc, TaskStatus, TeamMember } from "@/types";
 
 const supabase = createClient();
 
@@ -33,13 +32,20 @@ export async function deleteProject(id: string): Promise<void> {
 
 // Versions
 export async function getVersions(): Promise<Version[]> {
-    const { data, error } = await supabase.from("versions").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("versions")
+        .select(`
+            *,
+            owner:team_members(*)
+        `)
+        .order("created_at", { ascending: false });
     if (error) throw error;
 
     return data.map(v => ({
         ...v,
         projectId: v.project_id,
-        releaseDate: v.release_date
+        releaseDate: v.release_date,
+        ownerId: v.owner_id,
+        owner: v.owner ? { ...v.owner, avatarUrl: v.owner.avatar_url } : undefined
     }));
 }
 
@@ -49,19 +55,23 @@ export async function createVersion(version: Omit<Version, "id">): Promise<Versi
         name: version.name,
         status: version.status,
         release_date: version.releaseDate,
-        notes: version.notes
+        notes: version.notes,
+        owner_id: version.ownerId
     }).select().single();
 
     if (error) throw error;
-    return { ...data, projectId: data.project_id, releaseDate: data.release_date };
+    return { ...data, projectId: data.project_id, releaseDate: data.release_date, ownerId: data.owner_id };
 }
 
 export async function updateVersion(id: string, updates: Partial<Version>): Promise<void> {
     const dbUpdates: any = { ...updates };
     if (updates.projectId) dbUpdates.project_id = updates.projectId;
     if (updates.releaseDate) dbUpdates.release_date = updates.releaseDate;
+    if (updates.ownerId) dbUpdates.owner_id = updates.ownerId;
     delete dbUpdates.projectId;
     delete dbUpdates.releaseDate;
+    delete dbUpdates.ownerId;
+    delete dbUpdates.owner;
 
     const { error } = await supabase.from("versions").update(dbUpdates).eq("id", id);
     if (error) throw error;
@@ -78,7 +88,7 @@ export async function getTasks(): Promise<Task[]> {
         .from("tasks")
         .select(`
       *,
-      assignee:profiles(*)
+      assignee:team_members(*)
     `)
         .order("created_at", { ascending: false });
 
@@ -88,7 +98,7 @@ export async function getTasks(): Promise<Task[]> {
         ...t,
         projectId: t.project_id,
         versionId: t.version_id,
-        assignee: t.assignee
+        assignee: t.assignee ? { ...t.assignee, avatarUrl: t.assignee.avatar_url } : undefined
     }));
 }
 
@@ -173,11 +183,30 @@ export async function deleteDoc(id: string): Promise<void> {
     if (error) throw error;
 }
 
-// Users
-export async function getProfiles() {
-    const { data, error } = await supabase.from("profiles").select("*");
+// Team Members
+export async function getMembers(): Promise<TeamMember[]> {
+    const { data, error } = await supabase.from("team_members").select("*").order("name");
     if (error) throw error;
-    return data;
+    return data.map(m => ({
+        ...m,
+        avatarUrl: m.avatar_url
+    }));
+}
+
+export async function createMember(member: Partial<TeamMember>): Promise<TeamMember> {
+    const { data, error } = await supabase.from("team_members").insert({
+        name: member.name,
+        nickname: member.nickname,
+        role: member.role,
+        avatar_url: member.avatarUrl
+    }).select().single();
+    if (error) throw error;
+    return { ...data, avatarUrl: data.avatar_url };
+}
+
+export async function deleteMember(id: string): Promise<void> {
+    const { error } = await supabase.from("team_members").delete().eq("id", id);
+    if (error) throw error;
 }
 
 // Stats

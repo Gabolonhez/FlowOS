@@ -8,12 +8,11 @@ import {
     Map,
     FileText,
     Settings,
-    Search,
     ChevronLeft,
-    Command,
     ChevronsUpDown,
     Check,
-    LayoutGrid
+    LayoutGrid,
+    User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -40,6 +39,7 @@ export function Sidebar() {
         { name: t('common.board'), href: "/board", icon: Columns3 },
         { name: t('common.roadmap'), href: "/roadmap", icon: Map },
         { name: t('common.processes'), href: "/processes", icon: FileText },
+        { name: t('team.menu'), href: "/team", icon: User },
         { name: t('common.apps'), href: "/apps", icon: LayoutGrid },
         { name: t('common.settings'), href: "/settings", icon: Settings },
     ];
@@ -117,19 +117,7 @@ export function Sidebar() {
                 </Button>
             </div>
 
-            {/* Search */}
-            {!collapsed && (
-                <div className="px-3 py-3">
-                    <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-muted-foreground bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-                        <Search className="h-4 w-4" />
-                        <span>{t('common.search')}</span>
-                        <div className="ml-auto flex items-center gap-1 text-xs">
-                            <Command className="h-3 w-3" />
-                            <span>K</span>
-                        </div>
-                    </button>
-                </div>
-            )}
+
 
             {/* Navigation */}
             <nav className="flex-1 px-3 py-2 space-y-1">

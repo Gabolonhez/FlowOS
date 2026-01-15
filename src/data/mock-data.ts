@@ -1,4 +1,4 @@
-import { Profile, Project, Version, Task, Activity } from "@/types";
+import { Profile, Project, Version, Task, Activity, TeamMember } from "@/types";
 
 // Users
 export const users: Profile[] = [
@@ -66,6 +66,16 @@ export const versions: Version[] = [
     },
 ];
 
+// Team Members
+export const members: TeamMember[] = users.map(user => ({
+    id: user.id,
+    name: user.full_name || 'Unknown',
+    nickname: user.full_name?.split(' ')[0],
+    role: 'Member',
+    avatarUrl: user.avatar_url,
+    createdAt: new Date().toISOString()
+}));
+
 // Tasks
 export const tasks: Task[] = [
     {
@@ -77,7 +87,7 @@ export const tasks: Task[] = [
         description: "Add real-time heart rate tracking during workouts",
         status: "in_progress",
         priority: "high",
-        assignee: users[0],
+        assignee: members[0],
         createdAt: "2026-01-10T10:00:00Z",
         updatedAt: "2026-01-14T02:00:00Z",
     },
@@ -90,7 +100,7 @@ export const tasks: Task[] = [
         description: "Calories are not being calculated correctly for certain activities",
         status: "code_review",
         priority: "critical",
-        assignee: users[1],
+        assignee: members[1],
         createdAt: "2026-01-09T14:00:00Z",
         updatedAt: "2026-01-13T18:00:00Z",
     },
@@ -115,7 +125,7 @@ export const tasks: Task[] = [
         description: "Update the workout summary screen with new UI components",
         status: "done",
         priority: "medium",
-        assignee: users[0],
+        assignee: members[0],
         createdAt: "2026-01-05T11:00:00Z",
         updatedAt: "2026-01-12T16:00:00Z",
     },
@@ -140,7 +150,7 @@ export const tasks: Task[] = [
         description: "Complete redesign of the checkout process",
         status: "in_progress",
         priority: "high",
-        assignee: users[2],
+        assignee: members[2],
         createdAt: "2026-01-11T10:00:00Z",
         updatedAt: "2026-01-14T01:00:00Z",
     },

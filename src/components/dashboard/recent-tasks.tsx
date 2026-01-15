@@ -87,9 +87,9 @@ export function RecentTasks({ tasks }: RecentTasksProps) {
                             </div>
                             {task.assignee && (
                                 <Avatar className="h-8 w-8 ring-2 ring-background">
-                                    <AvatarImage src={task.assignee.avatar_url} />
+                                    <AvatarImage src={task.assignee.avatarUrl} />
                                     <AvatarFallback>
-                                        {task.assignee.full_name?.charAt(0) || '?'}
+                                        {task.assignee.name?.charAt(0) || '?'}
                                     </AvatarFallback>
                                 </Avatar>
                             )}

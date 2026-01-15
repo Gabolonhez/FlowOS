@@ -1,7 +1,7 @@
 
 export type TaskStatus = 'ideas' | 'backlog' | 'in_progress' | 'code_review' | 'done' | 'deployed';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
-export type VersionStatus = 'in_development' | 'in_stores' | 'deprecated';
+export type VersionStatus = 'planned' | 'in_development' | 'in_stores' | 'deprecated';
 export type DocType = 'process' | 'document';
 
 export interface Profile {
@@ -9,6 +9,15 @@ export interface Profile {
   email?: string;
   full_name?: string;
   avatar_url?: string;
+}
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  nickname?: string;
+  role?: string;
+  avatarUrl?: string; // mapped from avatar_url
+  createdAt?: string;
 }
 
 export interface Project {
@@ -26,6 +35,8 @@ export interface Version {
   status: VersionStatus;
   releaseDate?: string;
   notes?: string;
+  ownerId?: string;
+  owner?: TeamMember;
   createdAt?: string;
 }
 
@@ -39,7 +50,7 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   assigneeId?: string;
-  assignee?: Profile;
+  assignee?: TeamMember;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -21,6 +21,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/modals/confirm-dialog";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -43,6 +44,7 @@ export default function AppsPage() {
     const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState<Partial<Project>>({ name: "", prefix: "", color: "#3b82f6" });
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
     const { toast } = useToast();
     const { t } = useLanguage();
 
@@ -93,14 +95,20 @@ export default function AppsPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this app? This action cannot be undone.")) return;
+        setDeleteProjectId(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteProjectId) return;
         try {
-            await deleteProject(id);
+            await deleteProject(deleteProjectId);
             toast({ title: t('common.success'), description: "App deleted successfully" });
             fetchData();
         } catch (error) {
             console.error(error);
             toast({ title: t('common.error'), description: "Failed to delete app", variant: "destructive" });
+        } finally {
+            setDeleteProjectId(null);
         }
     };
 
@@ -220,6 +228,18 @@ export default function AppsPage() {
                     </form>
                 </DialogContent>
             </Dialog>
-        </div>
+
+
+            <ConfirmDialog
+                isOpen={!!deleteProjectId}
+                onClose={() => setDeleteProjectId(null)}
+                onConfirm={confirmDelete}
+                title={t('common.delete_title')}
+                description={t('common.delete_desc')}
+                confirmText={t('common.delete')}
+                cancelText={t('common.cancel')}
+                variant="destructive"
+            />
+        </div >
     );
 }

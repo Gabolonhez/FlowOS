@@ -6,20 +6,33 @@ import { getDocs, createDoc, updateDoc, deleteDoc } from "@/lib/api";
 import { Doc, DocType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, FileText, Workflow, Save, Trash, Loader2 } from "lucide-react";
+import { Plus, FileText, Workflow, Save, Trash, Loader2, Circle, Square, Type, Diamond, X } from "lucide-react";
 import ReactFlow, {
     addEdge,
     Background,
     Controls,
     MiniMap,
+    Panel,
     useNodesState,
     useEdgesState,
-    Connection
+    Connection,
+    MarkerType
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/language-context";
+import { ConfirmDialog } from "@/components/modals/confirm-dialog";
+import { PromptDialog } from "@/components/modals/prompt-dialog";
+import { DiamondNode, TextNode, CircleNode, RectangleNode } from "@/components/flow/custom-nodes";
+import { RichTextEditor } from "@/components/editor/rich-text-editor";
+
+const nodeTypes = {
+    diamond: DiamondNode,
+    text: TextNode,
+    circle: CircleNode,
+    rectangle: RectangleNode,
+};
 
 export default function ProcessesPage() {
     const { toast } = useToast();
@@ -28,6 +41,8 @@ export default function ProcessesPage() {
     const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [deleteDocId, setDeleteDocId] = useState<string | null>(null);
+    const [createDocType, setCreateDocType] = useState<DocType | null>(null);
 
     // Editor State
     const [content, setContent] = useState("");
@@ -67,13 +82,15 @@ export default function ProcessesPage() {
     }
 
     async function handleCreate(type: DocType) {
-        const title = prompt(t('processes.enter_title'));
-        if (!title) return;
+        setCreateDocType(type);
+    }
 
+    async function confirmCreate(title: string) {
+        if (!createDocType) return;
         try {
             const newDoc = await createDoc({
                 title,
-                type,
+                type: createDocType,
                 content: "",
                 flowDiagramJson: { nodes: [], edges: [] }
             });
@@ -82,6 +99,8 @@ export default function ProcessesPage() {
             toast({ title: t('common.success'), description: t('processes.created') });
         } catch (e) {
             toast({ title: t('common.error'), description: t('processes.create_error'), variant: "destructive" });
+        } finally {
+            setCreateDocType(null);
         }
     }
 
@@ -110,14 +129,69 @@ export default function ProcessesPage() {
     }
 
     async function handleDelete(id: string) {
-        if (!confirm(t('common.are_you_sure'))) return;
+        setDeleteDocId(id);
+    }
+
+    const [editNodeId, setEditNodeId] = useState<string | null>(null);
+
+    const addNode = (type: 'rectangle' | 'circle' | 'diamond' | 'text') => {
+        const id = `${type}-${Date.now()}`;
+        const label = type === 'text' ? 'Text' : type.charAt(0).toUpperCase() + type.slice(1);
+        const newNode = {
+            id,
+            type, // Use our custom types
+            position: { x: 100 + Math.random() * 50, y: 100 + Math.random() * 50 },
+            data: { label },
+        };
+        setNodes((nds) => nds.concat(newNode));
+    };
+
+    const onDeleteNode = useCallback(() => {
+        setNodes((nds) => nds.filter((node) => !node.selected));
+        setEdges((eds) => eds.filter((edge) => !edge.selected));
+    }, [setNodes, setEdges]);
+
+    // Handle Delete Key
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Delete' || event.key === 'Backspace') {
+                if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+                    onDeleteNode();
+                }
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [onDeleteNode]);
+
+    const onNodeDoubleClick = (_: React.MouseEvent, node: any) => {
+        setEditNodeId(node.id);
+    };
+
+    const handleRenameNode = (newLabel: string) => {
+        if (!editNodeId) return;
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id === editNodeId) {
+                    return { ...node, data: { ...node.data, label: newLabel } };
+                }
+                return node;
+            })
+        );
+        setEditNodeId(null);
+    };
+
+    async function confirmDelete() {
+        if (!deleteDocId) return;
         try {
-            await deleteDoc(id);
-            setDocs(docs.filter(d => d.id !== id));
-            if (selectedDocId === id) setSelectedDocId(null);
+            await deleteDoc(deleteDocId);
+            setDocs(docs.filter(d => d.id !== deleteDocId));
+            if (selectedDocId === deleteDocId) setSelectedDocId(null);
             toast({ title: t('common.success'), description: t('processes.deleted') });
         } catch (e) {
             toast({ title: t('common.error'), description: t('processes.delete_error'), variant: "destructive" });
+        } finally {
+            setDeleteDocId(null);
         }
     }
 
@@ -185,12 +259,12 @@ export default function ProcessesPage() {
                         </header>
                         <div className="flex-1 overflow-hidden relative">
                             {selectedDoc.type === 'document' ? (
-                                <textarea
-                                    className="w-full h-full p-8 resize-none bg-background focus:outline-none"
-                                    placeholder={t('processes.placeholder')}
-                                    value={content}
-                                    onChange={(e) => setContent(e.target.value)}
-                                />
+                                <div className="h-full w-full p-4">
+                                    <RichTextEditor
+                                        content={content}
+                                        onChange={setContent}
+                                    />
+                                </div>
                             ) : (
                                 <div className="h-full w-full">
                                     <ReactFlow
@@ -199,11 +273,34 @@ export default function ProcessesPage() {
                                         onNodesChange={onNodesChange}
                                         onEdgesChange={onEdgesChange}
                                         onConnect={onConnect}
+                                        onNodeDoubleClick={onNodeDoubleClick}
+                                        nodeTypes={nodeTypes}
                                         fitView
+                                        deleteKeyCode={['Backspace', 'Delete']}
                                     >
                                         <Background />
                                         <Controls />
                                         <MiniMap />
+                                        <Panel position="top-right" className="flex flex-col gap-2 bg-background/90 p-2 rounded-lg border shadow-sm backdrop-blur">
+                                            <div className="flex gap-1">
+                                                <Button size="icon" variant="ghost" onClick={() => addNode('rectangle')} title="Rectangle">
+                                                    <Square className="h-4 w-4" />
+                                                </Button>
+                                                <Button size="icon" variant="ghost" onClick={() => addNode('circle')} title="Circle">
+                                                    <Circle className="h-4 w-4" />
+                                                </Button>
+                                                <Button size="icon" variant="ghost" onClick={() => addNode('diamond')} title="Diamond">
+                                                    <Diamond className="h-4 w-4" />
+                                                </Button>
+                                                <Button size="icon" variant="ghost" onClick={() => addNode('text')} title="Text">
+                                                    <Type className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                            <div className="h-px bg-border my-1" />
+                                            <Button size="icon" variant="ghost" onClick={onDeleteNode} title="Delete Selected" className="text-destructive hover:text-destructive">
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </Panel>
                                     </ReactFlow>
                                 </div>
                             )}
@@ -212,10 +309,45 @@ export default function ProcessesPage() {
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
                         <FileText className="h-12 w-12 mb-4 opacity-20" />
-                        <p>{t('processes.select_doc_desc')}</p> {/* Reusing select_doc_desc or no_docs_desc, 'Select a document from the sidebar to view or edit its contents' fits but the short one is 'Select a document or create a new one' -> no_docs_desc. The English in code was 'Select a document or create a new one' so I will use no_docs_desc */}
+                        <p>{t('processes.select_doc_desc')}</p>
                     </div>
                 )}
             </div>
-        </div>
+
+
+            <ConfirmDialog
+                isOpen={!!deleteDocId}
+                onClose={() => setDeleteDocId(null)}
+                onConfirm={confirmDelete}
+                title={t('common.delete_title')}
+                description={t('common.delete_desc')}
+                confirmText={t('common.delete')}
+                cancelText={t('common.cancel')}
+                variant="destructive"
+            />
+
+            <PromptDialog
+                isOpen={!!createDocType}
+                onClose={() => setCreateDocType(null)}
+                onConfirm={confirmCreate}
+                title={t('processes.new_doc_title')}
+                description={t('processes.enter_title')}
+                placeholder={t('processes.doc_title')}
+                confirmText={t('common.create')}
+                cancelText={t('common.cancel')}
+            />
+
+            <PromptDialog
+                isOpen={!!editNodeId}
+                onClose={() => setEditNodeId(null)}
+                onConfirm={handleRenameNode}
+                title="Rename Node"
+                description="Enter a new label for this node:"
+                placeholder="Node Label"
+                defaultValue={nodes.find(n => n.id === editNodeId)?.data.label}
+                confirmText={t('common.save')}
+                cancelText={t('common.cancel')}
+            />
+        </div >
     );
 }
