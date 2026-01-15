@@ -1,14 +1,27 @@
-"use client";
-
-import { Task, STATUS_COLORS, PRIORITY_COLORS } from "@/types";
+import { Task, TaskStatus, TaskPriority } from "@/types";
 import { getVersionById } from "@/data/mock-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 interface RecentTasksProps {
     tasks: Task[];
 }
+
+const STATUS_COLORS: Record<TaskStatus, string> = {
+    ideas: "#94a3b8",
+    backlog: "#64748b",
+    in_progress: "#3b82f6",
+    code_review: "#8b5cf6",
+    done: "#22c55e",
+    deployed: "#10b981",
+};
+
+const PRIORITY_COLORS: Record<TaskPriority, string> = {
+    low: "#94a3b8",
+    medium: "#eab308",
+    high: "#f97316",
+    critical: "#ef4444",
+};
 
 const STATUS_LABELS: Record<Task["status"], string> = {
     ideas: "ideas",
@@ -74,9 +87,9 @@ export function RecentTasks({ tasks }: RecentTasksProps) {
                             </div>
                             {task.assignee && (
                                 <Avatar className="h-8 w-8 ring-2 ring-background">
-                                    <AvatarImage src={task.assignee.avatar} />
+                                    <AvatarImage src={task.assignee.avatar_url} />
                                     <AvatarFallback>
-                                        {task.assignee.name.charAt(0)}
+                                        {task.assignee.full_name?.charAt(0) || '?'}
                                     </AvatarFallback>
                                 </Avatar>
                             )}

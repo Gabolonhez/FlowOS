@@ -46,20 +46,20 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
                                 style={{ backgroundColor: ACTION_COLORS[activity.action] }}
                             />
                             <Avatar className="h-6 w-6 ml-3">
-                                <AvatarImage src={activity.user.avatar} />
+                                <AvatarImage src={activity.user?.avatar_url} />
                                 <AvatarFallback className="text-xs">
-                                    {activity.user.name.charAt(0)}
+                                    {activity.user?.full_name?.charAt(0) || '?'}
                                 </AvatarFallback>
                             </Avatar>
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm text-foreground">
-                                <span className="font-medium">{activity.user.name}</span>{" "}
+                                <span className="font-medium">{activity.user?.full_name || 'Unknown User'}</span>{" "}
                                 <span className="text-muted-foreground">{getActionText(activity)}</span>{" "}
                                 <span className="text-primary font-mono">{activity.taskCode}</span>
                             </p>
                             <p className="text-xs text-muted-foreground mt-0.5">
-                                {formatDistanceToNow(activity.timestamp)}
+                                {activity.timestamp ? formatDistanceToNow(activity.timestamp) : 'Just now'}
                             </p>
                         </div>
                     </div>

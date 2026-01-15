@@ -1,23 +1,23 @@
-import { User, Project, Version, Task, Activity } from "@/types";
+import { Profile, Project, Version, Task, Activity } from "@/types";
 
 // Users
-export const users: User[] = [
+export const users: Profile[] = [
     {
         id: "1",
-        name: "Sarah Chen",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+        full_name: "Sarah Chen",
+        avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
         email: "sarah@flowos.app",
     },
     {
         id: "2",
-        name: "Mike Johnson",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mike",
+        full_name: "Mike Johnson",
+        avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mike",
         email: "mike@flowos.app",
     },
     {
         id: "3",
-        name: "Alex Kim",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+        full_name: "Alex Kim",
+        avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
         email: "alex@flowos.app",
     },
 ];
@@ -153,7 +153,7 @@ export const activities: Activity[] = [
         userId: "1",
         user: users[0],
         action: "completed",
-        taskId: "4",
+        entityId: "4",
         taskCode: "FIT-71",
         timestamp: "2026-01-14T00:00:00Z",
     },
@@ -162,7 +162,7 @@ export const activities: Activity[] = [
         userId: "2",
         user: users[1],
         action: "moved",
-        taskId: "2",
+        entityId: "2",
         taskCode: "FIT-73",
         details: "to Code Review",
         timestamp: "2026-01-13T20:00:00Z",
@@ -172,7 +172,7 @@ export const activities: Activity[] = [
         userId: "3",
         user: users[2],
         action: "started",
-        taskId: "6",
+        entityId: "6",
         taskCode: "SHOP-42",
         timestamp: "2026-01-13T15:00:00Z",
     },
