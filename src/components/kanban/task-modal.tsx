@@ -174,8 +174,23 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
                         <div className="space-y-2">
                             <Label>{t('common.project')}</Label>
                             {task ? (
-                                <Select value={selectedProjectIds[0]} disabled>
+                                <Select 
+                                    value={selectedProjectIds[0]} 
+                                    onValueChange={(value) => {
+                                        setSelectedProjectIds([value]);
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            projectId: value,
+                                            versionId: "" // Reset version when project changes
+                                        }));
+                                    }}
+                                >
                                     <SelectTrigger><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        {projects.map(p => (
+                                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
                                 </Select>
                             ) : (
                                 <DropdownMenu>

@@ -10,7 +10,7 @@ import { getTasks, getProjects, getVersions, updateTaskStatus, deleteTask } from
 import { useProject } from "@/context/project-context";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/language-context";
-import { Plus, Loader2, Settings2, X } from "lucide-react";
+import { Plus, Loader2, Settings2, X, ArrowUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ConfirmDialog } from "@/components/modals/confirm-dialog";
 import { Input } from "@/components/ui/input";
@@ -51,6 +51,7 @@ export default function BoardPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [priorityFilter, setPriorityFilter] = useState<string>("all");
     const [versionFilter, setVersionFilter] = useState<string>("all");
+    const [sortBy, setSortBy] = useState<string>("created_at_desc");
 
     const [visibleColumns, setVisibleColumns] = useState<TaskStatus[]>([
         "ideas", "backlog", "in_progress", "code_review", "done", "deployed"
@@ -218,6 +219,24 @@ export default function BoardPage() {
         return matchesProject && matchesSearch && matchesPriority && matchesVersion;
     });
 
+    const priorityOrder: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+
+    const sortedTasks = [...filteredTasks].sort((a, b) => {
+        if (sortBy === 'created_at_desc') {
+            return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        }
+        if (sortBy === 'created_at_asc') {
+            return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+        }
+        if (sortBy === 'priority_desc') {
+            return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
+        }
+        if (sortBy === 'priority_asc') {
+            return (priorityOrder[a.priority] || 0) - (priorityOrder[b.priority] || 0);
+        }
+        return 0;
+    });
+
     const filteredVersions = selectedProjectId 
         ? versions.filter(v => v.projectId === selectedProjectId) 
         : versions;
@@ -295,6 +314,20 @@ export default function BoardPage() {
                             </SelectContent>
                         </Select>
                     </div>
+                    <div className="flex items-center gap-2">
+                        <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+                        <Select value={sortBy} onValueChange={setSortBy}>
+                            <SelectTrigger className="w-[180px] h-8">
+                                <SelectValue placeholder="Sort by" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="created_at_desc">Mais recentes</SelectItem>
+                                <SelectItem value="created_at_asc">Mais antigos</SelectItem>
+                                <SelectItem value="priority_desc">Maior prioridade</SelectItem>
+                                <SelectItem value="priority_asc">Menor prioridade</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             </header>
 
@@ -306,7 +339,7 @@ export default function BoardPage() {
                                 key={col.id}
                                 id={col.id}
                                 title={col.title}
-                                tasks={filteredTasks.filter(t => t.status === col.id)}
+                                tasks={sortedTasks.filter(t => t.status === col.id)}
                                 projects={projects}
                                 onTaskClick={handleTaskClick}
                                 onDelete={handleDeleteTask}
