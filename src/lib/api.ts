@@ -111,9 +111,9 @@ export async function updateTaskStatus(id: string, status: TaskStatus): Promise<
 
 export async function updateTask(id: string, updates: Partial<Task>): Promise<void> {
     const dbUpdates: any = { ...updates };
-    if (updates.projectId) dbUpdates.project_id = updates.projectId;
-    if (updates.versionId) dbUpdates.version_id = updates.versionId;
-    if (updates.assigneeId) dbUpdates.assignee_id = updates.assigneeId;
+    if (updates.projectId !== undefined) dbUpdates.project_id = updates.projectId;
+    if (updates.versionId !== undefined) dbUpdates.version_id = updates.versionId;
+    if (updates.assigneeId !== undefined) dbUpdates.assignee_id = updates.assigneeId;
 
     // Remove client-side fields
     delete dbUpdates.projectId;
@@ -135,14 +135,14 @@ export async function deleteTask(id: string): Promise<void> {
 export async function createTask(task: Partial<Task>): Promise<Task> {
     const { data, error } = await supabase.from("tasks").insert({
         project_id: task.projectId,
-        version_id: task.versionId,
+        version_id: task.versionId === undefined ? undefined : task.versionId,
         title: task.title,
         description: task.description,
         status: task.status,
         images: task.images,
         priority: task.priority,
         code: task.code || `TASK-${Math.floor(Math.random() * 10000)}`,
-        assignee_id: task.assigneeId
+        assignee_id: task.assigneeId === undefined ? undefined : task.assigneeId
     }).select().single();
     if (error) throw error;
     return data;

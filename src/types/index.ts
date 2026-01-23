@@ -44,13 +44,13 @@ export interface Task {
   id: string;
   code: string;
   projectId: string;
-  versionId?: string;
+  versionId?: string | null;
   version?: Version;
   title: string;
   description?: string;
   status: TaskStatus;
   priority: TaskPriority;
-  assigneeId?: string;
+  assigneeId?: string | null;
   assignee?: TeamMember;
   createdAt?: string;
   updatedAt?: string;

@@ -253,7 +253,9 @@ export default function BoardPage() {
         const matchesProject = selectedProjectId ? t.projectId === selectedProjectId : true;
         const matchesSearch = searchQuery ? t.title.toLowerCase().includes(searchQuery.toLowerCase()) || (t.code && t.code.toLowerCase().includes(searchQuery.toLowerCase())) : true;
         const matchesPriority = priorityFilter !== "all" ? t.priority === priorityFilter : true;
-        const matchesVersion = versionFilter !== "all" ? t.versionId === versionFilter : true;
+        const matchesVersion = versionFilter === "all" ? true :
+            versionFilter === "none" ? !t.versionId :
+                t.versionId === versionFilter;
         return matchesProject && matchesSearch && matchesPriority && matchesVersion;
     });
 
@@ -346,6 +348,7 @@ export default function BoardPage() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">{t('common.all_versions')}</SelectItem>
+                                <SelectItem value="none">{t('common.no_version_filter')}</SelectItem>
                                 {filteredVersions.map(v => (
                                     <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
                                 ))}

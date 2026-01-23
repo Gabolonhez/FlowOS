@@ -10,8 +10,6 @@ import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, Loader2 } from "lucide-react";
@@ -52,7 +50,7 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
                 setProjects(p);
                 setVersions(v);
                 setMembers(m);
-                
+
                 if (task) {
                     setSelectedProjectIds([task.projectId]);
                     setFormData({
@@ -87,18 +85,18 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
     const toggleProject = (projectId: string) => {
         // If editing existing task, do not allow multi-select or changing project easily (complex)
         // allowing checking only if it's new task
-        if (task) return; 
+        if (task) return;
 
         setSelectedProjectIds(prev => {
-           const next = prev.includes(projectId)
-             ? prev.filter(id => id !== projectId)
-             : [...prev, projectId];
-           
-           // Update formData.projectId to the first selected one for compatibility with version filter
-           if (next.length > 0) {
-               setFormData(fd => ({ ...fd, projectId: next[0] }));
-           }
-           return next;
+            const next = prev.includes(projectId)
+                ? prev.filter(id => id !== projectId)
+                : [...prev, projectId];
+
+            // Update formData.projectId to the first selected one for compatibility with version filter
+            if (next.length > 0) {
+                setFormData(fd => ({ ...fd, projectId: next[0] }));
+            }
+            return next;
         });
     };
 
@@ -114,11 +112,11 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
         try {
             const dataTemplate = {
                 ...formData,
-                assigneeId: formData.assigneeId === "none" ? undefined : formData.assigneeId,
-                versionId: formData.versionId === "" || selectedProjectIds.length > 1 ? undefined : formData.versionId, // Clear version if multi-project
+                assigneeId: formData.assigneeId === "none" ? null : formData.assigneeId,
+                versionId: formData.versionId === "" || formData.versionId === "none" || selectedProjectIds.length > 1 ? null : formData.versionId, // Clear version if none/multi-project
                 images: formData.imageUrls.split('\n').filter(url => url.trim().length > 0)
             };
-            
+
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { imageUrls, ...taskData } = dataTemplate;
 
@@ -127,7 +125,7 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
                 await updateTask(task.id, { ...taskData, projectId: selectedProjectIds[0] });
             } else {
                 // Create multiple tasks
-                await Promise.all(selectedProjectIds.map(pid => 
+                await Promise.all(selectedProjectIds.map(pid =>
                     createTask({ ...taskData, projectId: pid })
                 ));
             }
@@ -174,8 +172,8 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
                         <div className="space-y-2">
                             <Label>{t('common.project')}</Label>
                             {task ? (
-                                <Select 
-                                    value={selectedProjectIds[0]} 
+                                <Select
+                                    value={selectedProjectIds[0]}
                                     onValueChange={(value) => {
                                         setSelectedProjectIds([value]);
                                         setFormData(prev => ({
@@ -197,8 +195,8 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="outline" className="w-full justify-between font-normal">
                                             {selectedProjectIds.length === 0 ? t('common.select_project') :
-                                             selectedProjectIds.length === 1 ? projects.find(p => p.id === selectedProjectIds[0])?.name :
-                                             `${selectedProjectIds.length} projects selected`}
+                                                selectedProjectIds.length === 1 ? projects.find(p => p.id === selectedProjectIds[0])?.name :
+                                                    `${selectedProjectIds.length} projects selected`}
                                             <ChevronDown className="h-4 w-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -218,8 +216,8 @@ export function TaskModal({ open, onOpenChange, task, onSuccess }: TaskModalProp
                         </div>
                         <div className="space-y-2">
                             <Label>{t('roadmap.title')}</Label>
-                            <Select 
-                                value={formData.versionId} 
+                            <Select
+                                value={formData.versionId}
                                 onValueChange={v => setFormData({ ...formData, versionId: v })}
                                 disabled={selectedProjectIds.length > 1}
                             >
