@@ -5,19 +5,28 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatDistanceToNow(dateInput: string | Date): string {
+export function formatDistanceToNow(dateInput: string | Date | undefined | null): string {
+  if (!dateInput) return "Just now";
+
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
   const now = new Date();
   const diffInMs = now.getTime() - date.getTime();
-  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+  const diffInSeconds = Math.floor(diffInMs / 1000);
 
-  if (diffInHours < 1) {
-    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-    return `${diffInMinutes} minutes ago`;
+  if (diffInSeconds < 60) {
+    return "Just now";
   }
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) {
-    return `${diffInHours} hours ago`;
+    return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
   }
+
   const diffInDays = Math.floor(diffInHours / 24);
-  return `${diffInDays} days ago`;
+  return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`;
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import {
     LayoutDashboard,
     Columns3,
@@ -61,60 +62,76 @@ export function Sidebar() {
             )}
         >
             {/* Header / Project Switcher */}
-            <div className="flex items-center justify-between h-14 px-4 border-b border-sidebar-border">
-                {collapsed ? (
-                    <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                        <span className="text-primary-foreground font-bold text-sm">F</span>
+            <div className="flex flex-col border-b border-sidebar-border">
+                {/* Branding Section */}
+                <div className="flex items-center gap-3 h-14 px-4">
+                    <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0 overflow-hidden relative">
+                        <Image src="/logo.png" alt="VBoard" fill className="object-cover" />
                     </div>
-                ) : (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="w-full justify-start px-2 gap-2 font-semibold hover:bg-sidebar-accent truncate">
-                                <div className="w-6 h-6 rounded bg-primary/20 text-primary flex items-center justify-center shrink-0">
-                                    {selectedProject ? selectedProject.name[0] : "A"}
-                                </div>
-                                <span className="truncate">{selectedProject ? selectedProject.name : t('common.all_projects')}</span>
-                                <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56" align="start">
-                            <DropdownMenuLabel>{t('common.select_project')}</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setSelectedProjectId(null)}>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 rounded bg-slate-500/20 flex items-center justify-center border text-[10px]">A</div>
-                                    <span>{t('common.all_projects')}</span>
-                                    {selectedProjectId === null && <Check className="ml-auto h-4 w-4" />}
-                                </div>
-                            </DropdownMenuItem>
-                            {projects.map(project => (
-                                <DropdownMenuItem key={project.id} onClick={() => setSelectedProjectId(project.id)}>
-                                    <div className="flex items-center gap-2 w-full">
-                                        <div className="w-4 h-4 rounded bg-primary/20 flex items-center justify-center text-[10px]" style={{ color: project.color }}>
-                                            {project.name[0]}
-                                        </div>
-                                        <span>{project.name}</span>
-                                        {selectedProjectId === project.id && <Check className="ml-auto h-4 w-4" />}
+                    {!collapsed && <span className="font-bold text-xl tracking-tight text-sidebar-foreground">VBoard</span>}
+                    {!collapsed && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 ml-auto text-muted-foreground hover:text-sidebar-foreground"
+                            onClick={() => setCollapsed(true)}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                    )}
+                </div>
+
+                {/* Project Switcher */}
+                {!collapsed && (
+                    <div className="px-4 pb-4">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="w-full justify-start px-2 gap-2 font-semibold hover:bg-sidebar-accent truncate border border-sidebar-border bg-sidebar-accent/50">
+                                    <div className="w-6 h-6 rounded bg-primary/20 text-primary flex items-center justify-center shrink-0">
+                                        {selectedProject ? selectedProject.name[0] : "A"}
+                                    </div>
+                                    <span className="truncate">{selectedProject ? selectedProject.name : t('common.all_projects')}</span>
+                                    <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56" align="start">
+                                <DropdownMenuLabel>{t('common.select_project')}</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => setSelectedProjectId(null)}>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-4 h-4 rounded bg-slate-500/20 flex items-center justify-center border text-[10px]">A</div>
+                                        <span>{t('common.all_projects')}</span>
+                                        {selectedProjectId === null && <Check className="ml-auto h-4 w-4" />}
                                     </div>
                                 </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                {projects.map(project => (
+                                    <DropdownMenuItem key={project.id} onClick={() => setSelectedProjectId(project.id)}>
+                                        <div className="flex items-center gap-2 w-full">
+                                            <div className="w-4 h-4 rounded bg-primary/20 flex items-center justify-center text-[10px]" style={{ color: project.color }}>
+                                                {project.name[0]}
+                                            </div>
+                                            <span>{project.name}</span>
+                                            {selectedProjectId === project.id && <Check className="ml-auto h-4 w-4" />}
+                                        </div>
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 )}
 
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn("h-6 w-6 text-muted-foreground hover:text-sidebar-foreground", collapsed ? "mx-auto mt-2" : "ml-1")}
-                    onClick={() => setCollapsed(!collapsed)}
-                >
-                    <ChevronLeft
-                        className={cn(
-                            "h-4 w-4 transition-transform",
-                            collapsed && "rotate-180"
-                        )}
-                    />
-                </Button>
+                {collapsed && (
+                    <div className="flex items-center justify-center h-10 px-4 mb-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-sidebar-foreground"
+                            onClick={() => setCollapsed(false)}
+                        >
+                            <ChevronLeft className="h-4 w-4 rotate-180" />
+                        </Button>
+                    </div>
+                )}
             </div>
 
 

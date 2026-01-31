@@ -7,7 +7,10 @@ const supabase = createClient();
 export async function getProjects(): Promise<Project[]> {
     const { data, error } = await supabase.from("projects").select("*").order("name");
     if (error) throw error;
-    return data;
+    return data.map(p => ({
+        ...p,
+        createdAt: p.created_at
+    }));
 }
 
 export async function createProject(project: Partial<Project>): Promise<Project> {
@@ -45,7 +48,8 @@ export async function getVersions(): Promise<Version[]> {
         projectId: v.project_id,
         releaseDate: v.release_date,
         ownerId: v.owner_id,
-        owner: v.owner ? { ...v.owner, avatarUrl: v.owner.avatar_url } : undefined
+        owner: v.owner ? { ...v.owner, avatarUrl: v.owner.avatar_url, createdAt: v.owner.created_at } : undefined,
+        createdAt: v.created_at
     }));
 }
 
@@ -60,7 +64,13 @@ export async function createVersion(version: Omit<Version, "id">): Promise<Versi
     }).select().single();
 
     if (error) throw error;
-    return { ...data, projectId: data.project_id, releaseDate: data.release_date, ownerId: data.owner_id };
+    return {
+        ...data,
+        projectId: data.project_id,
+        releaseDate: data.release_date,
+        ownerId: data.owner_id,
+        createdAt: data.created_at
+    };
 }
 
 export async function updateVersion(id: string, updates: Partial<Version>): Promise<void> {
@@ -99,8 +109,10 @@ export async function getTasks(): Promise<Task[]> {
         ...t,
         projectId: t.project_id,
         versionId: t.version_id,
-        assignee: t.assignee ? { ...t.assignee, avatarUrl: t.assignee.avatar_url } : undefined,
-        version: t.version ? { ...t.version, projectId: t.version.project_id, releaseDate: t.version.release_date, ownerId: t.version.owner_id } : undefined
+        assignee: t.assignee ? { ...t.assignee, avatarUrl: t.assignee.avatar_url, createdAt: t.assignee.created_at } : undefined,
+        version: t.version ? { ...t.version, projectId: t.version.project_id, releaseDate: t.version.release_date, ownerId: t.version.owner_id, createdAt: t.version.created_at } : undefined,
+        createdAt: t.created_at,
+        updatedAt: t.updated_at
     }));
 }
 
@@ -146,7 +158,14 @@ export async function createTask(task: Partial<Task>): Promise<Task> {
         assignee_id: task.assigneeId === undefined ? undefined : task.assigneeId
     }).select().single();
     if (error) throw error;
-    return data;
+    return {
+        ...data,
+        projectId: data.project_id,
+        versionId: data.version_id,
+        assigneeId: data.assignee_id,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at
+    };
 }
 
 // Documents
@@ -156,7 +175,8 @@ export async function getDocs(): Promise<Doc[]> {
     return data.map(d => ({
         ...d,
         flowDiagramJson: d.flow_data,
-        updatedAt: d.updated_at
+        updatedAt: d.updated_at,
+        createdAt: d.created_at
     }));
 }
 
@@ -168,7 +188,7 @@ export async function createDoc(doc: Partial<Doc>): Promise<Doc> {
         flow_data: doc.flowDiagramJson
     }).select().single();
     if (error) throw error;
-    return { ...data, flowDiagramJson: data.flow_data, updatedAt: data.updated_at };
+    return { ...data, flowDiagramJson: data.flow_data, updatedAt: data.updated_at, createdAt: data.created_at };
 }
 
 export async function updateDoc(id: string, updates: Partial<Doc>): Promise<void> {
@@ -193,7 +213,8 @@ export async function getMembers(): Promise<TeamMember[]> {
     if (error) throw error;
     return data.map(m => ({
         ...m,
-        avatarUrl: m.avatar_url
+        avatarUrl: m.avatar_url,
+        createdAt: m.created_at
     }));
 }
 
@@ -205,7 +226,7 @@ export async function createMember(member: Partial<TeamMember>): Promise<TeamMem
         avatar_url: member.avatarUrl
     }).select().single();
     if (error) throw error;
-    return { ...data, avatarUrl: data.avatar_url };
+    return { ...data, avatarUrl: data.avatar_url, createdAt: data.created_at };
 }
 
 export async function deleteMember(id: string): Promise<void> {

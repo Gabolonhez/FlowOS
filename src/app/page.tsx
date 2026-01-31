@@ -88,7 +88,7 @@ export default function Dashboard() {
                   </div>
                   <div className="text-xs text-muted-foreground flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    {task.createdAt ? formatDistanceToNow(new Date(task.createdAt)) : 'Just now'}
+                    {formatDistanceToNow(task.createdAt)}
                   </div>
                 </div>
               ))}

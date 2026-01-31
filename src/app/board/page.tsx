@@ -69,14 +69,25 @@ export default function BoardPage() {
         "ideas", "backlog", "in_progress", "code_review", "done", "deployed"
     ]);
 
+    const [customColumnNames, setCustomColumnNames] = useState<Record<string, string>>({});
+
     useEffect(() => {
-        const saved = localStorage.getItem("flowos_board_columns");
-        if (saved) {
+        const savedColumns = localStorage.getItem("flowos_board_columns");
+        if (savedColumns) {
             try {
-                const parsed = JSON.parse(saved);
+                const parsed = JSON.parse(savedColumns);
                 if (Array.isArray(parsed) && parsed.length > 0) {
                     setVisibleColumns(parsed);
                 }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        const savedNames = localStorage.getItem("flowos_column_names");
+        if (savedNames) {
+            try {
+                setCustomColumnNames(JSON.parse(savedNames));
             } catch (e) {
                 console.error(e);
             }
@@ -119,13 +130,21 @@ export default function BoardPage() {
         });
     };
 
+    const handleRenameColumn = (id: TaskStatus, newName: string) => {
+        setCustomColumnNames(prev => {
+            const next = { ...prev, [id]: newName };
+            localStorage.setItem("flowos_column_names", JSON.stringify(next));
+            return next;
+        });
+    };
+
     const COLUMNS: { id: TaskStatus; title: string }[] = [
-        { id: "ideas", title: t('board.ideas') },
-        { id: "backlog", title: t('board.backlog') },
-        { id: "in_progress", title: t('board.in_progress') },
-        { id: "code_review", title: t('board.code_review') },
-        { id: "done", title: t('board.done') },
-        { id: "deployed", title: t('board.deployed') },
+        { id: "ideas", title: customColumnNames["ideas"] || t('board.ideas') },
+        { id: "backlog", title: customColumnNames["backlog"] || t('board.backlog') },
+        { id: "in_progress", title: customColumnNames["in_progress"] || t('board.in_progress') },
+        { id: "code_review", title: customColumnNames["code_review"] || t('board.code_review') },
+        { id: "done", title: customColumnNames["done"] || t('board.done') },
+        { id: "deployed", title: customColumnNames["deployed"] || t('board.deployed') },
     ];
 
     const sensors = useSensors(useSensor(PointerSensor, {
@@ -397,6 +416,7 @@ export default function BoardPage() {
                                 onDelete={handleDeleteTask}
                                 selectedTaskIds={selectedTaskIds}
                                 onToggleSelect={handleToggleSelect}
+                                onRename={(newName) => handleRenameColumn(col.id, newName)}
                             />
                         ))}
                     </div>
